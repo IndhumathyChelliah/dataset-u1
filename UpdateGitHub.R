@@ -60,6 +60,7 @@ UpdateGitHub <- function(repo=getwd(), untracked=TRUE, stage=TRUE, commit=TRUE, 
         writeLines(paste0("the current working directory:",repo))
     } else {
         repo <- find_rstudio_root_file()
+        writeLines(paste0("the current working directory:",repo))
     }
     
     # Check if there is anything to do. ####
