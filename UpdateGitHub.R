@@ -57,7 +57,7 @@ UpdateGitHub <- function(repo=getwd(), untracked=TRUE, stage=TRUE, commit=TRUE, 
     # Check the Project Root directory. This is to ensure that the entire repo is captured. ----
     if (getwd() == find_rstudio_root_file()) {
         repo <- getwd()
-        writeLines(paste0(repo))
+        writeLines(paste0("the current working directory:",repo))
     } else {
         repo <- find_rstudio_root_file()
     }
