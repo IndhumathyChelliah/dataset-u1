@@ -1,0 +1,35 @@
+---
+title: "git-command"
+author: "Indhumathy Chelliah"
+date: "2023-04-03"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+
+```{r cars}
+FileConnection <- file("Percent_Positivity-v5 (1).Rmd")
+writeLines( paste0("#This is a test script. Run at: ", format(Sys.time(), "%Y-%m-%d %H:%M:%S"))
+          , FileConnection
+          )
+close(FileConnection)
+rm(FileConnection)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+# Add the file
+add( repo = getwd()
+   , path = "Percent_Positivity-v5 (1).Rmd"
+   )
+```
+
