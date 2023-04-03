@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 
-```{r cars}
+```{r fileconn}
 FileConnection <- file("Percent_Positivity-v5 (1).Rmd")
 writeLines( paste0("#This is a test script. Run at: ", format(Sys.time(), "%Y-%m-%d %H:%M:%S"))
           , FileConnection
@@ -26,10 +26,38 @@ rm(FileConnection)
 
 You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
+```{r addfiles, echo=FALSE}
 # Add the file
 add( repo = getwd()
    , path = "Percent_Positivity-v5 (1).Rmd"
    )
 ```
 
+```{r commitfiles}
+commit( repo = getwd()
+      , message = paste0("Update as at: ", Sys.time(), "%Y-%m-%d %H:%M:%S")
+      )
+```
+
+```{r pullrepo}
+# Pull the Repo again
+pull( repo = getwd()
+    , credentials = cred_user_pass( username = "indhumathyblog@gmail.com" # BE CAREFUL!!
+                                  , password = "Karthi12$"  # BE CAREFUL!!
+                                  )                           # NEVER EVER PUSH YOUR CREDENTIALS TO ANY REPOSITORY!!!!
+
+    )
+```
+
+```{r pushrepo}
+# Push to the Repo
+push( object = getwd()
+    , credentials = cred_user_pass( username = "indhumathyblog@gmail.com" # BE CAREFUL!!
+                                  , password = "Karthi12$"  # BE CAREFUL!!
+                                  )                           # NEVER EVER PUSH YOUR CREDENTIALS TO ANY REPOSITORY!!!!
+    )
+```
+```{r}
+source(paste0(getwd(),"/","UpdateGitHub.R"))
+
+```
