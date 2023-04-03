@@ -1,1 +1,183 @@
-#This is a test script. Run at: 2023-04-02 22:26:27
+---
+title: "Percent_Positivity_Correlation"
+output: html_document
+date: "2023-03-13"
+---
+
+
+
+```{r ,echo=FALSE, warning=FALSE,results='hide',include=FALSE}
+library(readr)
+library(dplyr)
+setwd("C:/Indhu-R-Directory")
+df_idph <- read_csv("idph-lab-data.csv")
+df_idph_merged <- df_idph %>% group_by(week) %>% summarize(total_num = sum(total_pos),
+            total_denom = sum(total_tests_clean)) %>%
+  ungroup() %>%
+mutate(per_pos_overall = total_num / total_denom * 100)
+
+write.csv(df_idph_merged, "idph_merged.csv", row.names=FALSE)
+
+df_Commercial <- read.csv("commercial-lab-data.csv")
+ df <- merge(x=df_idph_merged,y=df_Commercial,by.x=c('week'),by.y=c('result_week'))
+ keeps <- c("week","percent_pos","per_pos_overall")
+ df1 = df[keeps]
+
+```
+
+```{r ,echo=FALSE,warning=FALSE,include=FALSE}
+colnames(df1) <- c('week','percent_pos_Commercial','percent_pos_IDPH')
+```
+
+```{r ,echo=FALSE,include=FALSE}
+library(lubridate)
+df1$week <- mdy( df1$week )
+```
+
+```{r,echo=FALSE,include=FALSE}
+df1_1 <- df1[order(df1$week),]
+df1_1$percent_pos_IDPH<- round(df1_1$percent_pos_IDPH,digit=2)
+df1_1$percent_pos_Commercial <- round(df1_1$percent_pos_Commercial,digit=2)
+write.csv(df1_1, "final_idph_merged.csv", row.names=FALSE)
+```
+
+
+
+
+
+```{r,echo=FALSE,include=FALSE}
+library(plotly)
+percent_positivity = plot_ly(data = df1_1, x = ~week, y = ~percent_pos_IDPH,
+                                 type = "scatter", name="IDPH",mode = "lines+markers", colors = colors,
+                                linetypes = c(rep("solid",4), "dotted"),
+                                 hovertemplate = paste('%{y}'), height = 500
+) %>%
+  layout(hovermode = "x unified",
+      
+         xaxis = list(title = "Date",zeroline=TRUE,zerolinecolor='#000000',zerolinewidth = 7,showgrid=F),
+         yaxis = list(title = "Percent Positivity",zeroline=TRUE,zerolinecolor='#000000',zerolinewidth = 7,showgrid=F),
+         title = "Percent Positivity of IDPH vs Commercial Lab Data"
+  ) 
+
+percent_positivity <- percent_positivity %>% add_trace(y = ~percent_pos_Commercial, name = 'Commercial_Data', mode = 'lines+markers') 
+
+
+percent_positivity
+```
+
+
+#####  $\color{blue}{\text{1. Percent Positivity of IDPH vs Commercial Lab Data}}$.
+
+```{r,echo=FALSE}
+percent_positivity
+```
+
+
+
+```{r,echo=FALSE, warning=FALSE,include=FALSE}
+df_idph_new <- read_csv("idph-lab-data.csv")
+df2<-df_idph_new[!(df_idph_new$ageDecade=="< 20"),]
+
+```
+
+
+```{r,echo=FALSE,warning=FALSE}
+df2_1 <- df2 %>%
+  group_by(week) %>%
+  summarize(total_num = sum(total_pos),
+            total_denom = sum(total_tests_clean)) %>%
+  ungroup() %>%
+  mutate(percent_pos_IDPH_1 = total_num / total_denom * 100)
+df_Commercial1 <- read.csv("commercial-lab-data.csv")
+df2_2 <- merge(x=df2_1,y=df_Commercial1,by.x=c('week'),by.y=c('result_week'))
+df2_2$week <- mdy( df2_2$week )
+df2_3 <- merge(x=df2_2,y=df1,by.x=c('week'),by.y=c('week'))
+keeps <- c("week","percent_pos_IDPH_1","percent_pos","percent_pos_IDPH")
+df2_4 = df2_3[keeps]
+
+```
+
+```{r,echo=FALSE,warning=FALSE}
+colnames(df2_4) <- c('week','IDPH_After_Removing_20','Commercial_Data_percent_pos','IDPH_percent_pos')
+df2_4$IDPH_After_Removing_20<- round(df2_4$IDPH_After_Removing_20,digit=2)
+df2_4$percent_pos_CommercialData <- round(df2_4$Commercial_Data_percent_pos,digit=2)
+df2_4$IDPH_percent_pos <- round(df2_4$IDPH_percent_pos,digit=2)
+keeps <- c("week","IDPH_After_Removing_20","Commercial_Data_percent_pos","IDPH_percent_pos")
+df2_5 = df2_4[keeps]
+write.csv(df2_5, "final_idph_merged_after_removing_below20.csv", row.names=FALSE)
+
+
+```
+
+```{r,echo=FALSE,warning=FALSE}
+percent_positivity1 = plot_ly(data = df2_4, x = ~week, y = ~IDPH_percent_pos,
+                                 type = "scatter", name="IDPH",mode = "lines+markers", colors = colors,
+                                linetypes = c(rep("solid",4), "dotted"),
+                                 hovertemplate = paste('%{y}'), height = 500
+) %>%
+  layout(hovermode = "x unified",
+      
+         xaxis = list(title = "Date",zeroline=TRUE,zerolinecolor='#000000',zerolinewidth = 7,showgrid=F),
+         yaxis = list(title = "Percent Positivity",zeroline=TRUE,zerolinecolor='#000000',zerolinewidth = 7,showgrid=F),
+         title = "Percent Positivity of IDPH vs Commercial Lab Data vs IDPH Data after removing below 20 data"
+  ) 
+
+percent_positivity1 <- percent_positivity1 %>% add_trace(y = ~Commercial_Data_percent_pos, name = 'Commercial_Data', mode = 'lines+markers') 
+
+percent_positivity1 <- percent_positivity1 %>% add_trace(y = ~IDPH_After_Removing_20, name = 'IDPH Data after removing bekow 20 data', mode = 'lines+markers') 
+
+```
+
+#####  $\color{blue}{\text{2. Percent Positivity of IDPH , IDPH after removing below 20 data vs Commercial Lab Data}}$.
+
+```{r,echo=FALSE}
+percent_positivity1 
+```
+
+
+#####  $\color{blue}{\text{3. Correlation Coefficient between IDPH data and Commercial Lab Data}}$.
+
+```{r,echo=FALSE,warning=FALSE}
+# Correlation between IDPH and Commercial Data
+print(round(cor(df2_4$IDPH_percent_pos,df2_4$Commercial_Data_percent_pos),2))
+
+```
+
+
+#####  $\color{blue}{\text{4. Correlation Coefficient between IDPH data after removing below 20 and Commercial Lab Data}}$.
+
+```{r,echo=FALSE,warning=FALSE}
+# Correlation between IDPH after removing below 20 and Commercial Data
+print(round(cor(df2_4$IDPH_After_Removing_20,df2_4$Commercial_Data_percent_pos),2))
+```
+
+
+
+```{r,echo=FALSE,include=FALSE}
+model <- lm(IDPH_percent_pos~Commercial_Data_percent_pos, data=df2_4)
+
+summary(model)
+summary(model)$r.squared
+```
+
+
+
+```{r,echo=FALSE,include=FALSE}
+model1 <- lm(IDPH_After_Removing_20~Commercial_Data_percent_pos, data=df2_4)
+summary(model1)
+summary(model1)$r.squared
+```
+
+#####  $\color{blue}{\text{5. Coefficient of Determination (R-Squared) IDPH vs Commercial LabData}}$.
+
+```{r,echo=FALSE}
+round(summary(model)$r.squared,2)
+```
+
+#####  $\color{blue}{\text{6. Coefficient of Determination (R-Squared) IDPH after removing below 20 vs Commercial LabData}}$.
+
+```{r,echo=FALSE}
+round(summary(model1)$r.squared,2)
+```
+
+####  $\color{red}{\text{Conclusion: Commercial data is well correlated to the IDPH data overall}}$.
